@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Guessing Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+    <div class="container">
+        <div class="game">
+            <h1 class="title">Number Guessing Game</h1>
+            <label for="name">Enter your name:</label>
+            <input type="text" id="name" />
+            <button onclick="startGame()">Start New Game</button>
+            <br />
+            <br />
+            <label for="guess">Enter your guess (4 digits):</label>
+            <input type="text" id="guess" />
+            <button onclick="makeGuess()">Guess</button>
+           
+            <p id="feedback"></p>
+        </div>
+        <div class="guessing-list">
+            <h2>Guessing List</h2>
+            <ol id="attemptsList"></ol>
+            <p id="finalScore"></p>
+        </div>
+       
+    </div>
+    
+    <script>
+        let secretNumber = '';
+        let attempts = 0;
+        let bestScore = Infinity;
+        let bestPlayer = '';
+
+        function generateSecretNumber() {
+            let numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            secretNumber = '';
+            while (secretNumber.length < 4) {
+                const index = Math.floor(Math.random() * numbers.length);
+                secretNumber += numbers.splice(index, 1)[0];
+            }
+        }
+
+        function startGame() {
+            const nameInput = document.getElementById('name');
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert('Please enter your name to start the game.');
+                return;
+            }
+
+            generateSecretNumber();
+            attempts = 0;
+            document.getElementById('guess').value = '';
+            document.getElementById('feedback').innerText = '';
+            document.getElementById('attemptsList').innerHTML = ''; // Clear previous attempts
+            alert(`Hi ${name}! The game has started. Try to guess the 4-digit number.`);
+        }
+     
+
+
+        function makeGuess() {
+            const guessInput = document.getElementById('guess');
+            const guess = guessInput.value.trim();
+
+            if (!/^\d{4}$/.test(guess)) {
+                alert('Please enter a valid 4-digit number.');
+                return;
+            }
+
+            let plus = 0;
+            let minus = 0;
+
+            for (let i = 0; i < guess.length; i++) {
+                const digit = guess[i];
+                if (secretNumber.includes(digit)) {
+                    if (secretNumber[i] === digit) {
+                        plus++;
+                    } else {
+                        minus++;
+                    }
+                }
+            }
+
+            attempts++;
+            const feedback = document.getElementById('feedback');
+            feedback.innerText = `Guess #${attempts}: ${guess} - +: ${plus}, -: ${minus}`;
+
+             // Create a new list item and append it to the ordered list
+            const listItem = document.createElement('li');
+            listItem.innerText = `Guess #${attempts}: ${guess} - +: ${plus}, -: ${minus}`;
+            document.getElementById('attemptsList').appendChild(listItem);
+
+            if (plus === 4) {
+                if (attempts < bestScore) {
+                    bestScore = attempts;
+                    bestPlayer = document.getElementById('name').value.trim();
+                    alert(`Congratulations! You guessed the number in ${attempts} attempts. You achieved the best score!`);
+                } else {
+                    alert(`Congratulations! You guessed the number in ${attempts} attempts.`);
+                }
+                document.getElementById('guess').value = ''; // Clear guess input field
+                return; // Stop here, don't restart the game automatically
+            }
+
+            guessInput.value = ''; // Clear guess input field
+        }
+    </script>
+</body>
+</html>
